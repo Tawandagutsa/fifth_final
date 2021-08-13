@@ -5,20 +5,44 @@ import '../widgets/customTextInput.dart';
 import '../constants/colors.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
+import '../models/http_exception.dart';
 
 import './login_screen.dart';
 
 import 'package:flutter/cupertino.dart';
 //Rememebr to make the fonts of the steps way smaller
 
-class SignupScreen extends StatelessWidget {
+class SignupScreen extends StatefulWidget {
   static const routeName = "/signup";
+
+  @override
+  _SignupScreenState createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
   TextEditingController _firstName = TextEditingController();
   TextEditingController _lastName = TextEditingController();
   TextEditingController _email = TextEditingController();
   TextEditingController _password = TextEditingController();
   TextEditingController _confirmPassword = TextEditingController();
   TextEditingController _phoneNumber = TextEditingController();
+
+  void _showErrorDialog(String message) {
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text('An Error Occured'),
+              content: Text(message),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Text('Okay'),
+                ),
+              ],
+            ));
+  }
 
   Map<String, String> _authData = {
     'email': '',
@@ -136,15 +160,38 @@ class SignupScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
-                      Provider.of<Auth>(context, listen: false).signup(
-                          _email.text,
-                          _firstName.text,
-                          _lastName.text,
-                          _password.text,
-                          _phoneNumber.text);
-                      print(_email.text);
-                      Navigator.of(context)
-                          .pushReplacementNamed(TabScreen.routeName);
+                      try {
+                        await Provider.of<Auth>(context, listen: false).signup(
+                            _email.text,
+                            _firstName.text,
+                            _lastName.text,
+                            _password.text,
+                            _phoneNumber.text);
+                        Navigator.of(context).pushNamed(TabScreen.routeName);
+                      } on HttpException catch (error) {
+                        var errorMessage = "Authentication failed.";
+                        if (error.toString().contains("EMAIL_EXISTS")) {
+                          errorMessage = "This email is already in use.";
+                        } else if (error.toString().contains("INVALID_EMAIL")) {
+                          errorMessage = "This is not a valid email address.";
+                        } else if (error.toString().contains("WEAK_PASSWORD")) {
+                          errorMessage = "This password is too weak.";
+                        } else if (error
+                            .toString()
+                            .contains("EMAIL_NOT_FOUND")) {
+                          errorMessage = "No user found with this email.";
+                        } else if (error
+                            .toString()
+                            .contains("INVALID_PASSWORD")) {
+                          errorMessage = "Invalid password.";
+                        }
+                        _showErrorDialog(errorMessage);
+                      } catch (error) {
+                        var errorMessage =
+                            "Could not Authenticate you. Please check your internet connection.";
+                        _showErrorDialog(errorMessage);
+                        print(errorMessage);
+                      }
                     },
                     child: Text("Next"),
                   ),

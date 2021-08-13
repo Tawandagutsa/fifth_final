@@ -16,37 +16,6 @@ class Data {
     //   tag: '30 September 2021',
     //   imagePath: 'assets/images/furniture/burger_promo.png',
     // ),
-    // Promotion(
-    //   backgroundImagePath: 'assets/images/splash2.png',
-    //   reverseGradient: true,
-    //   title: 'Get voucher gift',
-    //   subtitle: '\$50.00',
-    //   caption: '*for new member\'s\nof Furniture Shop',
-    // ),
-    // Promotion(
-    //   backgroundImagePath: 'assets/images/splash1.png',
-    //   reverseGradient: false,
-    //   title: 'For all your fries\nDiscount Up to',
-    //   subtitle: '50%',
-    //   tag: '30 September 2021',
-    //   imagePath: 'assets/images/furniture/fries1.png',
-    // ),
-    // Promotion(
-    //   backgroundImagePath: 'assets/images/splash1.png',
-    //   reverseGradient: true,
-    //   title: 'For all your Shawarma\nDiscount Up to',
-    //   subtitle: '50%',
-    //   tag: '30 September 2021',
-    //   imagePath: 'assets/images/furniture/shwama.png',
-    // ),
-    // Promotion(
-    //   backgroundImagePath: 'assets/images/splash1.png',
-    //   reverseGradient: true,
-    //   title: 'For all your Vegetables\nDiscount Up to',
-    //   subtitle: '50%',
-    //   tag: '30 September 2021',
-    //   imagePath: 'assets/images/furniture/vegs.png',
-    // ),
   ];
 
   static List<String> trending = [

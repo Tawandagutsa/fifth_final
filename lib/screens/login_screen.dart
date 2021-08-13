@@ -12,6 +12,7 @@ import './products_overview_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fifth/screens/products_overview_screen.dart';
 import '../screens/tab_screen.dart';
+import '../models/http_exception.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -25,11 +26,29 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _myEmailcontroller = TextEditingController();
   final _myPasswordcontroller = TextEditingController();
+  var _isLoading = false;
 
   Map<String, String> _authData = {
-    'email': 'tawandagutsa@outlook.com',
-    'password': 'Re2volver108',
+    'email': '',
+    'password': '',
   };
+
+  void _showErrorDialog(String message) {
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text('An Error Occured'),
+              content: Text(message),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Text('Okay'),
+                ),
+              ],
+            ));
+  }
 
   // @override
   // void dispose() {
@@ -91,11 +110,43 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        await Provider.of<Auth>(context, listen: false).login(
-                          _authData['email'],
-                          _authData['password'],
-                        );
-                        Navigator.of(context).pushNamed(TabScreen.routeName);
+                        try {
+                          await Provider.of<Auth>(context, listen: false).login(
+                            _myEmailcontroller.text,
+                            _myPasswordcontroller.text,
+                          );
+                          Navigator.of(context).pushNamed(TabScreen.routeName);
+                        } on HttpException catch (error) {
+                          var errorMessage = "Authentication failed.";
+                          if (error.toString().contains("EMAIL_EXISTS")) {
+                            errorMessage = "This email is already in use.";
+                          } else if (error
+                              .toString()
+                              .contains("INVALID_EMAIL")) {
+                            errorMessage = "This is not a valid email address.";
+                          } else if (error
+                              .toString()
+                              .contains("WEAK_PASSWORD")) {
+                            errorMessage = "This password is too weak.";
+                          } else if (error
+                              .toString()
+                              .contains("EMAIL_NOT_FOUND")) {
+                            errorMessage = "No user found with this email.";
+                          } else if (error
+                              .toString()
+                              .contains("INVALID_PASSWORD")) {
+                            errorMessage = "Invalid password.";
+                          }
+                          _showErrorDialog(errorMessage);
+                        } catch (error) {
+                          var errorMessage =
+                              "Could not Authenticate you. Please check your internet connection.";
+                          _showErrorDialog(errorMessage);
+                          print(errorMessage);
+                        }
+                        setState(() {
+                          _isLoading = false;
+                        });
                       },
                       child: Text(
                         "Login",
@@ -151,7 +202,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () async {
+                        await Provider.of<Auth>(context, listen: false)
+                            .googleSignIn()
+                            .then((_) => {
+                                  Navigator.of(context)
+                                      .pushNamed(TabScreen.routeName)
+                                });
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

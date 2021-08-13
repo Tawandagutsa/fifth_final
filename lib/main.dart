@@ -24,8 +24,10 @@ import 'package:fifth/screens/newpassword_screen.dart';
 import 'package:fifth/screens/signup_screen1.dart';
 import 'package:fifth/screens/landing_screen.dart';
 import 'package:fifth/screens/sentOTPScreen.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 

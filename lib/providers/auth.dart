@@ -77,6 +77,7 @@ class Auth with ChangeNotifier {
       final responseData = json.decode(response.body);
       print(response.body);
       if (responseData['error'] != null) {
+        print("hello");
         throw HttpException(responseData['error']['message']);
       }
       _token = responseData['idToken'];
@@ -85,19 +86,18 @@ class Auth with ChangeNotifier {
           .add(Duration(seconds: int.parse(responseData['expiresIn'])));
 
       if (signup) {
-        print(_userId);
-        final url =
+        final url2 =
             'https://fifth-api.herokuapp.com/api/v1/users/create/$_userId';
-        var response = await http.post(
-          Uri.parse(url),
-          body: json.encode({
-            "firstname": "hona",
-            "lastname": "ffgbgh",
-            "email": "email@gmail.com",
-            "phoneNumber": "088799856"
+        await http.post(
+          Uri.parse(url2),
+          body: jsonEncode({
+            "firstname": firstname,
+            "lastname": lastname,
+            "email": email,
+            "phoneNumber": phone
           }),
+          headers: {'Content-Type': 'application/json'},
         );
-        print(response.body);
       }
 
       notifyListeners();
